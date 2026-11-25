@@ -110,6 +110,6 @@ abstract class Result extends Collection implements ResultInterface
 
     protected function isJson(): bool
     {
-        return str_contains($this->httpResponse->getHeader('content-type')[0], 'application/json');
+        return str_contains($this->httpResponse->getHeaderLine('content-type'), 'application/json');
     }
 }

@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Vazaha\Mastodon\Proxies;
 
 use Vazaha\Mastodon\Abstracts\Proxy;
+use Vazaha\Mastodon\Abstracts\Result;
 use Vazaha\Mastodon\Exceptions\InvalidResponseException;
 use Vazaha\Mastodon\Helpers\UploadFile;
 use Vazaha\Mastodon\Models\MediaAttachmentModel;
@@ -56,14 +57,7 @@ class MediaProxy extends Proxy
             $id,
         ));
 
-        /** @var null|\Vazaha\Mastodon\Models\MediaAttachmentModel $model */
-        $model = $result->first();
-
-        if ($model === null) {
-            throw new InvalidResponseException();
-        }
-
-        return $model;
+        return $this->requireModel($result);
     }
 
     /**
@@ -89,14 +83,7 @@ class MediaProxy extends Proxy
             $focus,
         ));
 
-        /** @var null|\Vazaha\Mastodon\Models\MediaAttachmentModel $model */
-        $model = $result->first();
-
-        if ($model === null) {
-            throw new InvalidResponseException();
-        }
-
-        return $model;
+        return $this->requireModel($result);
     }
 
     /**
@@ -124,14 +111,7 @@ class MediaProxy extends Proxy
             $focus,
         ));
 
-        /** @var null|\Vazaha\Mastodon\Models\MediaAttachmentModel $model */
-        $model = $result->first();
-
-        if ($model === null) {
-            throw new InvalidResponseException();
-        }
-
-        return $model;
+        return $this->requireModel($result);
     }
 
     /**
@@ -157,11 +137,27 @@ class MediaProxy extends Proxy
             $focus,
         ));
 
+        return $this->requireModel($result);
+    }
+
+    /**
+     * Extract the single MediaAttachment model from the result, or throw an
+     * exception carrying the HTTP status code and body when the response
+     * did not contain a model.
+     */
+    private function requireModel(Result $result): MediaAttachmentModel
+    {
         /** @var null|\Vazaha\Mastodon\Models\MediaAttachmentModel $model */
         $model = $result->first();
 
         if ($model === null) {
-            throw new InvalidResponseException();
+            $response = $result->getHttpResponse();
+
+            throw new InvalidResponseException(sprintf(
+                'Expected a MediaAttachment model but the response was empty (HTTP %d): %s',
+                $response->getStatusCode(),
+                $result->getBody(),
+            ));
         }
 
         return $model;
