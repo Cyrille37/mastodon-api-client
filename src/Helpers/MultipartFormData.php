@@ -9,9 +9,8 @@ class MultipartFormData
     /**
      * @param array<string, mixed> $params
      */
-    public function __construct(
-        protected array $params,
-    ) {
+    public function __construct(protected array $params)
+    {
     }
 
     /**
@@ -68,11 +67,20 @@ class MultipartFormData
             $contents = (string) $contents;
         }
 
-        if (is_string($contents) || is_numeric($contents) || is_bool($contents)) {
+        if (is_string($contents) || is_numeric($contents)) {
             return [
                 [
                     'name' => $baseName,
                     'contents' => (string) $contents,
+                ],
+            ];
+        }
+
+        if (is_bool($contents)) {
+            return [
+                [
+                    'name' => $baseName,
+                    'contents' => (int) $contents,
                 ],
             ];
         }
